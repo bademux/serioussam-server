@@ -1,9 +1,11 @@
 #download once for multiarch build
 FROM scratch as caching-downloader
-ADD https://github.com/ptitSeb/Serious-Engine/archive/d11af2bad8fc216a4408cf2fc658227599130e10.zip /target.zip
+#ADD https://github.com/ptitSeb/Serious-Engine/archive/d11af2bad8fc216a4408cf2fc658227599130e10.zip /target.zip
+ADD Serious-Engine-master.zip /target.zip
 
-FROM alpine:3.13.2 as builder
-RUN apk add --no-cache --update bash libarchive-tools flex bison cmake build-base coreutils libvorbis-dev libogg-dev zlib-dev sdl2-dev
+FROM debian:buster-slim as builder
+RUN apt-get update && apt-get install --no-install-recommends --yes \
+    flex bison cmake make patch g++ libvorbis-dev libogg-dev libsdl2-dev bsdtar
 COPY --from=caching-downloader / /tmp
 WORKDIR /build
 RUN mkdir target && bsdtar -zxvf /tmp/target.zip --strip-components=1 -C target
@@ -20,9 +22,11 @@ RUN printf ''\
 RUN cmake target/Sources -DCMAKE_BUILD_TYPE=RelWithDebInfo -DBUILD_DEDICATED_SERVER=TRUE && \ 
     make GameMP EntitiesMP Shaders SeriousSamDedicated -j$(nproc)
 
-FROM alpine:3.13.2
+FROM debian:buster-slim
 MAINTAINER bademux
-RUN apk add --no-cache --update libstdc++ sdl2 libgcc strace
+RUN apt-get update && apt-get install --no-install-recommends --yes \
+    libsdl2-2.0-0 &&\
+    rm -rf /var/lib/apt/lists/*
 ENV LD_LIBRARY_PATH="$LD_LIBRARY_PATH:/usr/local/lib64:/usr/local/lib"
 EXPOSE 25600/udp
 EXPOSE 25600/tcp

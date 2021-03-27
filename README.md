@@ -19,9 +19,10 @@ docker run -it -p 25600:25600/udp -p 25600:25600/tcp \
 ```
 
 # Sources
-https://github.com/bademux/serioussam-serve
+https://github.com/bademux/serioussam-server
+
 # Docker Registry
-https://hub.docker.com/repository/docker/bademux/serioussam-server
+https://hub.docker.com/r/bademux/serioussam-server
 
 # Refs
 https://github.com/ptitSeb/Serious-Engine
